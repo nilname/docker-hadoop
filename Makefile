@@ -12,8 +12,15 @@ build:
 
 wordcount:
 	docker build -t hadoop-wordcount ./submit
-	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8 hdfs dfs -mkdir -p /input/
-	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8 hdfs dfs -copyFromLocal -f /opt/hadoop-3.2.1/README.txt /input/
-	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8 hdfs dfs -rm -r /output
-	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} hadoop-wordcount
-	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8 hdfs dfs -cat /output/*
+	docker run --rm  --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8 hdfs dfs -mkdir -p /input/
+	docker run --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} -v /root/bigdata/docker-hadoop/:/root/ bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8 hdfs dfs -copyFromLocal -f /root/fruit.txt /input/
+	#docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8 hdfs dfs -copyFromLocal -f /opt/hadoop-3.2.1/README.txt /input/
+	#docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8 hdfs dfs -rm -r /output
+	docker run --rm  --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} hadoop-wordcount
+	docker run  --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8 hdfs dfs -cat /output/*
+clean:
+	docker-compose down
+	docker volume rm docker-hadoop_hadoop_datanode
+	docker volume rm docker-hadoop_hadoop_datanode3
+	docker volume rm docker-hadoop_hadoop_datanode2
+	docker volume rm docker-hadoop_hadoop_namenode
